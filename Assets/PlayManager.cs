@@ -1,9 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
 public class PlayManager : MonoBehaviour
 {
+    [SerializeField] Congky congky;
     [SerializeField] grass grassPrefab;
     [SerializeField] road roadPrefab;
     [SerializeField] int initialGrassCount = 5;
@@ -14,6 +17,10 @@ public class PlayManager : MonoBehaviour
 
     private List<Terrain> terrainList;
     Dictionary<int, Terrain> activeTerrainDict = new Dictionary<int, Terrain>(20);
+
+    [SerializeField] private int travelDistance;
+
+    public UnityEvent <int, int> OnUpdateTerrainLimit;
 
     private void Start() {
 
@@ -38,21 +45,15 @@ public class PlayManager : MonoBehaviour
         for (int zPos = initialGrassCount;  zPos < forwardViewDistances; zPos++)
         {
             
-            var terrain = SpawnRandomTerrain(zPos);
+                SpawnRandomTerrain(zPos);
 
-            
-            terrain.Generate(horizontalSize);
-
-            activeTerrainDict[zPos] = terrain;
         }
-        SpawnRandomTerrain(0);
     }
 
     private Terrain SpawnRandomTerrain(int zPos)
     {
         Terrain terrainCheck = null;
         int randomIndex;
-        Terrain terrain = null;
         for (int z = -1; z >= -3; z--)
         {
             var checkPos = zPos + z;
@@ -64,9 +65,7 @@ public class PlayManager : MonoBehaviour
             else if(terrainCheck.GetType() != activeTerrainDict[checkPos].GetType())
             {
                 randomIndex = Random.Range(0,terrainList.Count);
-                terrain = Instantiate(terrainList[randomIndex]);
-                terrain.transform.localPosition = new Vector3(0,0,zPos);
-            return terrain;
+                return SpawnTerrain(terrainList[randomIndex], zPos);
             }
             else{
                 continue;
@@ -84,8 +83,38 @@ public class PlayManager : MonoBehaviour
         }
 
     randomIndex = Random.Range(0,CandidateTerrain.Count);
-    terrain = Instantiate(CandidateTerrain[randomIndex]);
-    terrain.transform.position = new Vector3(0,0,zPos);
-            return terrain;
+    return SpawnTerrain(CandidateTerrain[randomIndex], zPos);
     }
+
+    public Terrain SpawnTerrain(Terrain terrain, int zPos)
+    {
+    terrain = Instantiate(terrain);
+    terrain.transform.position = new Vector3(0,0,zPos);
+    terrain.Generate(horizontalSize);
+    activeTerrainDict[zPos] = terrain;
+    return terrain;
+    }
+
+    public void UpdateTravelDistance(Vector3 targetPosition)
+    {
+        if(targetPosition.z > travelDistance)
+        {
+            travelDistance = Mathf.CeilToInt(targetPosition.z);
+            UpdateTerrain();
+        }
+    }
+
+    public void UpdateTerrain()
+    {
+        var destroyPos = travelDistance-1+backViewDistances;
+        Destroy(activeTerrainDict[destroyPos].gameObject);
+        activeTerrainDict.Remove(destroyPos);
+
+       var spawnPosition = travelDistance - 1 + forwardViewDistances;
+       SpawnRandomTerrain(spawnPosition);
+
+        OnUpdateTerrainLimit.Invoke(horizontalSize, travelDistance + backViewDistances);
+       
+    }
+    
 }

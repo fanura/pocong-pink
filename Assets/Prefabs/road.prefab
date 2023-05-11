@@ -45,3 +45,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tilePrefab: {fileID: 4142498935890470138, guid: 90866013fdbc37a4ea4ace777aeaa58e, type: 3}
+  kuntiPrefab: {fileID: -2691548991704719555, guid: d4d73bd13acbd7c458371b0b899ccf76, type: 3}
+  minKuntiSpawnInterval: 1
+  maxKuntiSpawnInterval: 3

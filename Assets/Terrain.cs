@@ -6,12 +6,16 @@ public class Terrain : MonoBehaviour
 {
     [SerializeField] GameObject tilePrefab;
 
+    protected int horizontalSize;
+
     private void Start(){
         Generate(9);
     }
 
     public virtual void Generate(int size)
     {
+
+        horizontalSize = size;
         if(size == 0)
             return;
 
