@@ -47,4 +47,4 @@ MonoBehaviour:
   tilePrefab: {fileID: 4142498935890470138, guid: 37a84cff3d08ce5479b93f8b4d9c27cd, type: 3}
   nisanPrefab: {fileID: 5024826796771461374, guid: 6ad2f9120e8530740a8d15e6280ee21d, type: 3}
   nisanPrefablist: []
-  nisanProbability: 0
+  nisanProbability: 1

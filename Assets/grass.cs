@@ -8,51 +8,53 @@ public class grass : Terrain
     [SerializeField] List <GameObject> nisanPrefablist;
     [SerializeField, Range(0,1)] float nisanProbability;
 
-    public void SetNisanPercentage(float newProbability)
-    {
-        this.nisanProbability = Mathf.Clamp01(newProbability);
-    }
+ public void SetNisanPercentage(float newProbability)
+   {
+    this.nisanProbability = Mathf.Clamp01(newProbability);
+   }
 
     public override void Generate(int size)
     {
         base.Generate(size);
 
         var limit = Mathf.FloorToInt((float)size / 2);
-        var nisanCount = Mathf.FloorToInt((float)size / 3);
+        var nisanCount = Mathf.FloorToInt((float)size * nisanProbability);
 
-        List<int>emptyPosition = new List<int>();
+        List<int> emptyPosition = new List<int>();
         for (int i = -limit; i <= limit; i++)
         {
             emptyPosition.Add(i);
         }
 
-            for (int i = 0; i <= nisanCount; i++)
+        //
+        for (int i = 0; i < nisanCount; i++)
         {
-            // memilih posisi kosong secara random
-            var randomIndex = Random.Range(0, emptyPosition.Count-1);
-            var pos = emptyPosition[randomIndex];
+            //Debug.Log(i + string.Join(",",emptyPosition));
+            var randomIndex = Random.Range(0,emptyPosition.Count);
+            var pos = emptyPosition [randomIndex];
 
-            // posisi yang terpilih dihapus dari daftar posisi kosong
+            //
             emptyPosition.RemoveAt(randomIndex);
-
+       
             SpawnRandomNisan(pos);
-           
+        }
 
-        }   
-
-                // selalu ada nisan diujung
+        //
         SpawnRandomNisan(-limit -1);
         SpawnRandomNisan(limit +1);
+    }
 
-    }     
+    private void SpawnRandomNisan(int xPos)
+    {
+       //
+            var randomIndex = Random.Range(0, nisanPrefablist.Count);
+            var prefab = nisanPrefablist[randomIndex];
 
-
-
-        private void SpawnRandomNisan(int pos)
-        {
-            // set nisan
-            var nisan = Instantiate(nisanPrefab, transform);
-            nisan.transform.localPosition = new Vector3(pos,1.5f,2);
-            
-        }
+            //
+            var nisan = Instantiate(
+                prefab,
+                new Vector3(xPos,0,this.transform.position.z), 
+                Quaternion.identity, 
+                transform);
+    }
 }
